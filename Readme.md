@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Вадим Шендер](https://up.htmlacademy.ru/javascript/10/user/210523).
-* Наставник: `Неизвестно`.
+* Наставник: [Андрей Фирсов](https://github.com/vorobeez).
 
 ---
 
