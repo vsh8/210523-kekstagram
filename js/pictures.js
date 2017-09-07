@@ -101,11 +101,17 @@ renderPhotos(picturesBlock, photos);
 
 // Implement photo popup window opening and closing.
 var photoPopup = document.querySelector('.gallery-overlay');
-var photoPopupClose = document.querySelector('.gallery-overlay-close');
+var photoPopupCloseElement = document.querySelector('.gallery-overlay-close');
 var photoElements = document.querySelectorAll('.picture');
 
 var onPhotoPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
+    closePhotoPopup();
+  }
+};
+
+var onPhotoPopupCloseElementEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
     closePhotoPopup();
   }
 };
@@ -120,31 +126,30 @@ var openPhotoPopup = function (photoElement) {
 
   document.addEventListener('keydown', onPhotoPopupEscPress);
 
+  photoPopupCloseElement.addEventListener('click', closePhotoPopup);
+  photoPopupCloseElement.addEventListener('keydown', onPhotoPopupCloseElementEnterPress);
+
   photoPopup.classList.remove('hidden');
 };
 
 var closePhotoPopup = function () {
-  photoPopup.classList.add('hidden');
-
   document.removeEventListener('keycode', onPhotoPopupEscPress);
+
+  photoPopupCloseElement.removeEventListener('click', closePhotoPopup);
+  photoPopupCloseElement.removeEventListener('keydown', onPhotoPopupCloseElementEnterPress);
+
+  photoPopup.classList.add('hidden');
 };
 
-for (i = 0; i < photoElements.length; i++) {
-  photoElements[i].addEventListener('click', function (evt) {
+picturesBlock.addEventListener('click', function (evt) {
+  if (evt.target.tagName.toLowerCase() == 'img') {
     openPhotoPopup(evt.target.parentElement);
     evt.preventDefault();
-  });
-  photoElements[i].addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      openPhotoPopup(evt.target);
-      evt.preventDefault();
-    }
-  });
-}
-
-photoPopupClose.addEventListener('click', closePhotoPopup);
-photoPopupClose.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    closePhotoPopup();
+  }
+});
+picturesBlock.addEventListener('keydown', function (evt) {
+  if (evt.target.tagName.toLowerCase() == 'img' && evt.keyCode === ENTER_KEYCODE) {
+    openPhotoPopup(evt.target);
+    evt.preventDefault();
   }
 });
