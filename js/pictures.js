@@ -147,7 +147,7 @@ picturesBlock.addEventListener('click', function (evt) {
   }
 });
 picturesBlock.addEventListener('keydown', function (evt) {
-  if (evt.target.tagName.toLowerCase() === 'img' && evt.keyCode === ENTER_KEYCODE) {
+  if (evt.target.tagName.toLowerCase() === 'a' && evt.keyCode === ENTER_KEYCODE) {
     openPhotoPopup(evt.target);
     evt.preventDefault();
   }
