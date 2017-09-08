@@ -102,7 +102,6 @@ renderPhotos(picturesBlock, photos);
 // Implement photo popup window opening and closing.
 var photoPopup = document.querySelector('.gallery-overlay');
 var photoPopupCloseElement = document.querySelector('.gallery-overlay-close');
-var photoElements = document.querySelectorAll('.picture');
 
 var onPhotoPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
@@ -142,13 +141,13 @@ var closePhotoPopup = function () {
 };
 
 picturesBlock.addEventListener('click', function (evt) {
-  if (evt.target.tagName.toLowerCase() == 'img') {
+  if (evt.target.tagName.toLowerCase() === 'img') {
     openPhotoPopup(evt.target.parentElement);
     evt.preventDefault();
   }
 });
 picturesBlock.addEventListener('keydown', function (evt) {
-  if (evt.target.tagName.toLowerCase() == 'img' && evt.keyCode === ENTER_KEYCODE) {
+  if (evt.target.tagName.toLowerCase() === 'img' && evt.keyCode === ENTER_KEYCODE) {
     openPhotoPopup(evt.target);
     evt.preventDefault();
   }
