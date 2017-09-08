@@ -1,5 +1,10 @@
 'use strict';
 
+// Keycode constants.
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
+
 var LIKES_MIN = 15;
 var LIKES_MAX = 200;
 
@@ -34,7 +39,7 @@ var randChoice = function (items) {
 };
 
 
-// Generate random comment.
+// Generate a random comment.
 var generateComment = function () {
   var comment = randChoice(COMMENTS);
   var commentLength = randInt(MAX_COMMENT_LENGTH);
@@ -44,7 +49,7 @@ var generateComment = function () {
   return comment;
 };
 
-// Generate random photo description by its number.
+// Generate a random photo description by its number.
 var generatePhotoData = function (n) {
   var comments = [];
   var commentsNumber = randIntRange(MIN_COMMENTS_NUMBER, MAX_COMMENTS_NUMBER + 1);
@@ -60,7 +65,7 @@ var generatePhotoData = function (n) {
 };
 
 
-// Render photo by its description.
+// Render the photo by its description.
 var renderPhoto = function (photo) {
   var photoTemplate = document.querySelector('#picture-template').content;
   var photoElement = photoTemplate.cloneNode(true);
@@ -89,22 +94,61 @@ for (var i = 0; i < PHOTOS_NUMBER; i++) {
   photos.push(generatePhotoData(i + 1));
 }
 
-
-// Fill the photo modal block with the photo data.
-var fillPhoto = function (photoModalBlock, photo) {
-  photoModalBlock.querySelector('img').setAttribute('src', photo.url);
-  photoModalBlock.querySelector('.likes-count').textContent = photo.likes;
-  photoModalBlock.querySelector('.comments-count').textContent = photo.comments.length;
-};
-
-
 // Draw the photos.
 var picturesBlock = document.querySelector('.pictures');
 renderPhotos(picturesBlock, photos);
 
 
-// Show first photo using modal photo block.
-var photoModalBlock = document.querySelector('.gallery-overlay');
+// Implement photo popup window opening and closing.
+var photoPopup = document.querySelector('.gallery-overlay');
+var photoPopupCloseElement = document.querySelector('.gallery-overlay-close');
 
-fillPhoto(photoModalBlock, photos[0]);
-photoModalBlock.classList.remove('hidden');
+var onPhotoPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePhotoPopup();
+  }
+};
+
+var onPhotoPopupCloseElementEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePhotoPopup();
+  }
+};
+
+var openPhotoPopup = function (photoElement) {
+  photoPopup.querySelector('img').setAttribute(
+      'src', photoElement.querySelector('img').getAttribute('src'));
+  photoPopup.querySelector('.likes-count').textContent =
+    photoElement.querySelector('.picture-likes').textContent;
+  photoPopup.querySelector('.comments-count').textContent =
+    photoElement.querySelector('.picture-comments').textContent;
+
+  document.addEventListener('keydown', onPhotoPopupEscPress);
+
+  photoPopupCloseElement.addEventListener('click', closePhotoPopup);
+  photoPopupCloseElement.addEventListener('keydown', onPhotoPopupCloseElementEnterPress);
+
+  photoPopup.classList.remove('hidden');
+};
+
+var closePhotoPopup = function () {
+  document.removeEventListener('keycode', onPhotoPopupEscPress);
+
+  photoPopupCloseElement.removeEventListener('click', closePhotoPopup);
+  photoPopupCloseElement.removeEventListener('keydown', onPhotoPopupCloseElementEnterPress);
+
+  photoPopup.classList.add('hidden');
+};
+
+picturesBlock.addEventListener('click', function (evt) {
+  if (evt.target.tagName.toLowerCase() === 'img') {
+    openPhotoPopup(evt.target.parentElement);
+    evt.preventDefault();
+  }
+});
+picturesBlock.addEventListener('keydown', function (evt) {
+  if (evt.target.tagName.toLowerCase() === 'a' && evt.keyCode === ENTER_KEYCODE) {
+    openPhotoPopup(evt.target);
+    evt.preventDefault();
+  }
+});
