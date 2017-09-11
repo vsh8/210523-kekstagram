@@ -152,3 +152,186 @@ picturesBlock.addEventListener('keydown', function (evt) {
     evt.preventDefault();
   }
 });
+
+
+var uploadFileElement = document.querySelector('.upload-input');
+var uploadFormElement = document.querySelector('.upload-form');
+var uploadOverlayElement = document.querySelector('.upload-overlay');
+var uploadInputElements = uploadOverlayElement.querySelectorAll('input, textarea');
+var uploadResizeValueElement = document.querySelector('.upload-resize-controls-value');
+var uploadResizeDecElement = document.querySelector('.upload-resize-controls-button-dec');
+var uploadResizeIncElement = document.querySelector('.upload-resize-controls-button-inc');
+var uploadEffectPreviewElement = document.querySelector('.effect-image-preview');
+var uploadEffectElement = document.querySelector('.upload-effect-controls');
+var uploadDescriptionElement = document.querySelector('.upload-form-description');
+var uploadHashtagsElement = document.querySelector('.upload-form-hashtags');
+var uploadCancelElement = document.querySelector('.upload-form-cancel');
+
+// Close upload dialog if Esc key pressed.
+var onUploadOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeUploadOverlay();
+  }
+};
+
+// Prevent upload dialog closing on pressing Esc key in description input.
+var onUploadDescriptionEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    evt.stopPropagation();
+  }
+};
+
+// Decrease resize value.
+var uploadResizeValueDec = function () {
+  var currentValue = parseInt(uploadResizeValueElement.value, 10);
+  if (currentValue > 25) {
+    currentValue -= 25;
+    uploadResizeValueElement.value = currentValue + '%';
+    resizeUploadImagePreview();
+  }
+};
+
+// Increase resize value.
+var uploadResizeValueInc = function () {
+  var currentValue = parseInt(uploadResizeValueElement.value, 10);
+  if (currentValue < 100) {
+    currentValue += 25;
+    uploadResizeValueElement.value = currentValue + '%';
+    resizeUploadImagePreview();
+  }
+};
+
+// Resize upload image.
+var resizeUploadImagePreview = function () {
+  var resizeValue = parseInt(uploadResizeValueElement.value, 10);
+  uploadEffectPreviewElement.style.transform = 'scale(' + (resizeValue / 100) + ')';
+};
+
+// Change upload image effect.
+var onUploadEffectClick = function (evt) {
+  if (evt.target.tagName.toLowerCase() === 'input') {
+    var effect = evt.target.id.substring(7);
+    uploadEffectPreviewElement.setAttribute('class', 'effect-image-preview ' + effect);
+  }
+};
+
+// Validate upload image description.
+var validateUploadDescription = function (evt) {
+  if (evt.target.value.length > 140) {
+    evt.target.setCustomValidity('Длина комментария не должна превышать 140 символов');
+  } else {
+    evt.target.setCustomValidity('');
+  }
+};
+
+// Validate uplaod image hashtags.
+var validateUploadHashtags = function (evt) {
+  var tags = evt.target.value.split(/ +/);
+  var usedTags = {};
+
+  if (tags.length === 1 && tags[0] === '') {
+    evt.target.setCustomValidity('');
+    return;
+  }
+
+  for (i = 0; i < tags.length; i++) {
+    if (tags[i][0] !== '#') {
+      evt.target.setCustomValidity('Хэш-тег должен начинаться с символа #');
+      return;
+    }
+
+    if (tags[i].length > 20) {
+      evt.target.setCustomValidity('Максимальная длина одного хэш-тега равна 20 символов');
+      return;
+    }
+
+    if (tags[i] in usedTags) {
+      evt.target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
+      return;
+    }
+
+    usedTags[tags[i]] = true;
+  }
+
+  if (tags.length > 5) {
+    evt.target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
+    return;
+  }
+
+  evt.target.setCustomValidity('');
+};
+
+// Mark invalid upload input.
+var markInvalidInput = function (evt) {
+  evt.target.classList.add('upload-message-error');
+};
+
+// Remove invalid mark on valid input.
+var unmarkValidInput = function (evt) {
+  evt.target.classList.remove('upload-message-error');
+};
+
+// Reset upload form on submit.
+var onUploadFormSubmit = function (evt) {
+  // Нужно выполнить этот код _после_ отправки формы, но в этот момент данной страницы уже не существует.
+  // evt.target.reset();
+};
+
+// Open upload image dialog.
+var openUploadOverlay = function () {
+  uploadOverlayElement.classList.remove('hidden');
+
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+
+  uploadCancelElement.addEventListener('click', closeUploadOverlay);
+  uploadCancelElement.addEventListener('click', closeUploadOverlay);
+
+  uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
+
+  uploadResizeDecElement.addEventListener('click', uploadResizeValueDec);
+  uploadResizeIncElement.addEventListener('click', uploadResizeValueInc);
+
+  uploadEffectElement.addEventListener('click', onUploadEffectClick);
+
+  uploadDescriptionElement.addEventListener('input', validateUploadDescription);
+  uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+
+  for (i = 0; i < uploadInputElements.length; i++) {
+    uploadInputElements[i].addEventListener('invalid', markInvalidInput);
+    uploadInputElements[i].addEventListener('valid', unmarkValidInput);
+  }
+
+  uploadFormElement.addEventListener('submit', onUploadFormSubmit);
+};
+
+// Close upload image dialog.
+var closeUploadOverlay = function () {
+  uploadOverlayElement.classList.add('hidden');
+
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+
+  uploadCancelElement.removeEventListener('click', closeUploadOverlay);
+  uploadCancelElement.removeEventListener('click', closeUploadOverlay);
+
+  uploadDescriptionElement.removeEventListener('keydown', onUploadDescriptionEscPress);
+
+  uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
+  uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
+
+  uploadEffectElement.removeEventListener('click', onUploadEffectClick);
+
+  uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
+  uploadHashtagsElement.removeEventListener('input', validateUploadHashtags);
+
+  for (i = 0; i < uploadInputElements.length; i++) {
+    uploadInputElements[i].removeEventListener('invalid', markInvalidInput);
+    uploadInputElements[i].removeEventListener('valid', unmarkValidInput);
+  }
+
+  uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
+
+  uploadFileElement.click();
+};
+
+var uploadFileInputElement = document.querySelector('#upload-file');
+uploadFileInputElement.addEventListener('change', openUploadOverlay);
