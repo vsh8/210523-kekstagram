@@ -23,6 +23,16 @@ var MAX_COMMENT_LENGTH = 2;
 var PHOTOS_NUMBER = 25;
 
 
+var RESIZE_MIN_VALUE = 25;
+var RESIZE_MAX_VALUE = 100;
+var RESIZE_STEP = 25;
+
+var DESCRIPTION_MAX_LENGTH = 140;
+
+var TAG_MAX_LENGTH = 20;
+var TAGS_MAX_NUMBER = 5;
+
+
 // Generate a random integer number.
 var randInt = function (n) {
   return Math.floor(n * Math.random());
@@ -53,7 +63,7 @@ var generateComment = function () {
 var generatePhotoData = function (n) {
   var comments = [];
   var commentsNumber = randIntRange(MIN_COMMENTS_NUMBER, MAX_COMMENTS_NUMBER + 1);
-  for (var i = 0; i < commentsNumber; i++) {
+  for (var j = 0; j < commentsNumber; j++) {
     comments.push(generateComment());
   }
 
@@ -81,8 +91,8 @@ var renderPhoto = function (photo) {
 // Add the given photos to the specified block.
 var renderPhotos = function (containerBlock, photos) {
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < photos.length; i++) {
-    fragment.appendChild(renderPhoto(photos[i]));
+  for (var j = 0; j < photos.length; j++) {
+    fragment.appendChild(renderPhoto(photos[j]));
   }
   containerBlock.appendChild(fragment);
 };
@@ -184,8 +194,8 @@ var onUploadDescriptionEscPress = function (evt) {
 // Decrease resize value.
 var uploadResizeValueDec = function () {
   var currentValue = parseInt(uploadResizeValueElement.value, 10);
-  if (currentValue > 25) {
-    currentValue -= 25;
+  if (currentValue > RESIZE_MIN_VALUE) {
+    currentValue -= RESIZE_STEP;
     uploadResizeValueElement.value = currentValue + '%';
     resizeUploadImagePreview();
   }
@@ -194,8 +204,8 @@ var uploadResizeValueDec = function () {
 // Increase resize value.
 var uploadResizeValueInc = function () {
   var currentValue = parseInt(uploadResizeValueElement.value, 10);
-  if (currentValue < 100) {
-    currentValue += 25;
+  if (currentValue < RESIZE_MAX_VALUE) {
+    currentValue += RESIZE_STEP;
     uploadResizeValueElement.value = currentValue + '%';
     resizeUploadImagePreview();
   }
@@ -217,7 +227,7 @@ var onUploadEffectClick = function (evt) {
 
 // Validate upload image description.
 var validateUploadDescription = function (evt) {
-  if (evt.target.value.length > 140) {
+  if (evt.target.value.length > DESCRIPTION_MAX_LENGTH) {
     evt.target.setCustomValidity('Длина комментария не должна превышать 140 символов');
   } else {
     evt.target.setCustomValidity('');
@@ -234,26 +244,26 @@ var validateUploadHashtags = function (evt) {
     return;
   }
 
-  for (i = 0; i < tags.length; i++) {
-    if (tags[i][0] !== '#') {
+  for (var j = 0; j < tags.length; j++) {
+    if (tags[j][0] !== '#') {
       evt.target.setCustomValidity('Хэш-тег должен начинаться с символа #');
       return;
     }
 
-    if (tags[i].length > 20) {
+    if (tags[j].length > TAG_MAX_LENGTH) {
       evt.target.setCustomValidity('Максимальная длина одного хэш-тега равна 20 символов');
       return;
     }
 
-    if (tags[i] in usedTags) {
+    if (tags[j] in usedTags) {
       evt.target.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
       return;
     }
 
-    usedTags[tags[i]] = true;
+    usedTags[tags[j]] = true;
   }
 
-  if (tags.length > 5) {
+  if (tags.length > TAGS_MAX_NUMBER) {
     evt.target.setCustomValidity('Нельзя указать больше пяти хэш-тегов');
     return;
   }
@@ -266,14 +276,13 @@ var markInvalidInput = function (evt) {
   evt.target.classList.add('upload-message-error');
 };
 
-// Remove invalid mark on valid input.
-var unmarkValidInput = function (evt) {
+// Remove invalid mark on input.
+var unmarkInvalidInput = function (evt) {
   evt.target.classList.remove('upload-message-error');
 };
 
 // Reset upload form on submit.
 var onUploadFormSubmit = function (evt) {
-  // Нужно выполнить этот код _после_ отправки формы, но в этот момент данной страницы уже не существует.
   // evt.target.reset();
 };
 
@@ -283,7 +292,6 @@ var openUploadOverlay = function () {
 
   document.addEventListener('keydown', onUploadOverlayEscPress);
 
-  uploadCancelElement.addEventListener('click', closeUploadOverlay);
   uploadCancelElement.addEventListener('click', closeUploadOverlay);
 
   uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
@@ -296,9 +304,9 @@ var openUploadOverlay = function () {
   uploadDescriptionElement.addEventListener('input', validateUploadDescription);
   uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
 
-  for (i = 0; i < uploadInputElements.length; i++) {
-    uploadInputElements[i].addEventListener('invalid', markInvalidInput);
-    uploadInputElements[i].addEventListener('valid', unmarkValidInput);
+  for (var j = 0; j < uploadInputElements.length; j++) {
+    uploadInputElements[j].addEventListener('invalid', markInvalidInput);
+    uploadInputElements[j].addEventListener('input', unmarkInvalidInput);
   }
 
   uploadFormElement.addEventListener('submit', onUploadFormSubmit);
@@ -311,7 +319,6 @@ var closeUploadOverlay = function () {
   document.removeEventListener('keydown', onUploadOverlayEscPress);
 
   uploadCancelElement.removeEventListener('click', closeUploadOverlay);
-  uploadCancelElement.removeEventListener('click', closeUploadOverlay);
 
   uploadDescriptionElement.removeEventListener('keydown', onUploadDescriptionEscPress);
 
@@ -323,9 +330,9 @@ var closeUploadOverlay = function () {
   uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
   uploadHashtagsElement.removeEventListener('input', validateUploadHashtags);
 
-  for (i = 0; i < uploadInputElements.length; i++) {
-    uploadInputElements[i].removeEventListener('invalid', markInvalidInput);
-    uploadInputElements[i].removeEventListener('valid', unmarkValidInput);
+  for (var j = 0; j < uploadInputElements.length; j++) {
+    uploadInputElements[j].removeEventListener('invalid', markInvalidInput);
+    uploadInputElements[j].removeEventListener('input', unmarkInvalidInput);
   }
 
   uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
