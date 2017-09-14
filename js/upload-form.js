@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-  var RESIZE_MIN_VALUE = 25;
-  var RESIZE_MAX_VALUE = 100;
-  var RESIZE_STEP = 25;
 
   var DESCRIPTION_MAX_LENGTH = 140;
 
@@ -13,9 +10,7 @@
   var uploadFileElement = document.querySelector('.upload-input');
   var uploadFormElement = document.querySelector('.upload-form');
   var uploadOverlayElement = document.querySelector('.upload-overlay');
-  var uploadResizeValueElement = document.querySelector('.upload-resize-controls-value');
-  var uploadResizeDecElement = document.querySelector('.upload-resize-controls-button-dec');
-  var uploadResizeIncElement = document.querySelector('.upload-resize-controls-button-inc');
+  var uploadResizeElement = document.querySelector('.upload-resize-controls');
   var uploadEffectPreviewElement = document.querySelector('.effect-image-preview');
   var uploadDescriptionElement = document.querySelector('.upload-form-description');
   var uploadHashtagsElement = document.querySelector('.upload-form-hashtags');
@@ -31,30 +26,8 @@
     window.util.isEscEvent(evt, evt.stopPropagation);
   };
 
-  // Decrease resize value.
-  var uploadResizeValueDec = function () {
-    var currentValue = parseInt(uploadResizeValueElement.value, 10);
-    if (currentValue > RESIZE_MIN_VALUE) {
-      currentValue -= RESIZE_STEP;
-      uploadResizeValueElement.value = currentValue + '%';
-      resizeUploadImagePreview();
-    }
-  };
-
-  // Increase resize value.
-  var uploadResizeValueInc = function () {
-    var currentValue = parseInt(uploadResizeValueElement.value, 10);
-    if (currentValue < RESIZE_MAX_VALUE) {
-      currentValue += RESIZE_STEP;
-      uploadResizeValueElement.value = currentValue + '%';
-      resizeUploadImagePreview();
-    }
-  };
-
-  // Resize upload image.
-  var resizeUploadImagePreview = function () {
-    var resizeValue = parseInt(uploadResizeValueElement.value, 10);
-    uploadEffectPreviewElement.style.transform = 'scale(' + (resizeValue / 100) + ')';
+  var adjustPreviewImageScale = function (scale) {
+    uploadEffectPreviewElement.style.transform = 'scale(' + (scale / 100) + ')';
   };
 
   // Validate upload image description.
@@ -128,9 +101,7 @@
 
     uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
 
-    uploadResizeDecElement.addEventListener('click', uploadResizeValueDec);
-    uploadResizeIncElement.addEventListener('click', uploadResizeValueInc);
-
+    window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
     window.effects.setupEffects();
 
     uploadDescriptionElement.addEventListener('input', validateUploadDescription);
@@ -150,9 +121,7 @@
 
     uploadDescriptionElement.removeEventListener('keydown', onUploadDescriptionEscPress);
 
-    uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
-    uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
-
+    window.scale.resetScale();
     window.effects.resetEffects();
 
     uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
