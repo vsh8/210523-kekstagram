@@ -167,7 +167,6 @@ picturesBlock.addEventListener('keydown', function (evt) {
 var uploadFileElement = document.querySelector('.upload-input');
 var uploadFormElement = document.querySelector('.upload-form');
 var uploadOverlayElement = document.querySelector('.upload-overlay');
-var uploadInputElements = uploadOverlayElement.querySelectorAll('input, textarea');
 var uploadResizeValueElement = document.querySelector('.upload-resize-controls-value');
 var uploadResizeDecElement = document.querySelector('.upload-resize-controls-button-dec');
 var uploadResizeIncElement = document.querySelector('.upload-resize-controls-button-inc');
@@ -239,12 +238,11 @@ var validateUploadHashtags = function (evt) {
   var tags = evt.target.value.split(/ +/);
   var usedTags = {};
 
-  if (tags.length === 1 && tags[0] === '') {
-    evt.target.setCustomValidity('');
-    return;
-  }
-
   for (var j = 0; j < tags.length; j++) {
+    if (tags[j] === '') {
+      continue;
+    }
+
     if (tags[j][0] !== '#') {
       evt.target.setCustomValidity('Хэш-тег должен начинаться с символа #');
       return;
@@ -271,14 +269,15 @@ var validateUploadHashtags = function (evt) {
   evt.target.setCustomValidity('');
 };
 
-// Mark invalid upload input.
-var markInvalidInput = function (evt) {
-  evt.target.classList.add('upload-message-error');
-};
+// Mark invalid input.
+var updateInputValidationStatus = function (evt) {
+  if (evt.target.checkValidity()) {
+    evt.target.classList.remove('upload-message-error');
+  } else {
+    evt.target.classList.add('upload-message-error');
+  }
 
-// Remove invalid mark on input.
-var unmarkInvalidInput = function (evt) {
-  evt.target.classList.remove('upload-message-error');
+  evt.stopPropagation();
 };
 
 // Reset upload form on submit.
@@ -304,12 +303,8 @@ var openUploadOverlay = function () {
   uploadDescriptionElement.addEventListener('input', validateUploadDescription);
   uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
 
-  for (var j = 0; j < uploadInputElements.length; j++) {
-    uploadInputElements[j].addEventListener('invalid', markInvalidInput);
-    uploadInputElements[j].addEventListener('input', unmarkInvalidInput);
-  }
-
   uploadFormElement.addEventListener('submit', onUploadFormSubmit);
+  uploadFormElement.addEventListener('input', updateInputValidationStatus);
 };
 
 // Close upload image dialog.
@@ -330,12 +325,8 @@ var closeUploadOverlay = function () {
   uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
   uploadHashtagsElement.removeEventListener('input', validateUploadHashtags);
 
-  for (var j = 0; j < uploadInputElements.length; j++) {
-    uploadInputElements[j].removeEventListener('invalid', markInvalidInput);
-    uploadInputElements[j].removeEventListener('input', unmarkInvalidInput);
-  }
-
   uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
+  uploadFormElement.removeEventListener('input', updateInputValidationStatus);
 
   uploadFileElement.click();
 };
