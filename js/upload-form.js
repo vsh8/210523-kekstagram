@@ -17,7 +17,6 @@
   var uploadResizeDecElement = document.querySelector('.upload-resize-controls-button-dec');
   var uploadResizeIncElement = document.querySelector('.upload-resize-controls-button-inc');
   var uploadEffectPreviewElement = document.querySelector('.effect-image-preview');
-  var uploadEffectElement = document.querySelector('.upload-effect-controls');
   var uploadDescriptionElement = document.querySelector('.upload-form-description');
   var uploadHashtagsElement = document.querySelector('.upload-form-hashtags');
   var uploadCancelElement = document.querySelector('.upload-form-cancel');
@@ -56,14 +55,6 @@
   var resizeUploadImagePreview = function () {
     var resizeValue = parseInt(uploadResizeValueElement.value, 10);
     uploadEffectPreviewElement.style.transform = 'scale(' + (resizeValue / 100) + ')';
-  };
-
-  // Change upload image effect.
-  var onUploadEffectClick = function (evt) {
-    if (evt.target.tagName.toLowerCase() === 'input') {
-      var effect = evt.target.id.substring(7);
-      uploadEffectPreviewElement.setAttribute('class', 'effect-image-preview ' + effect);
-    }
   };
 
   // Validate upload image description.
@@ -140,7 +131,7 @@
     uploadResizeDecElement.addEventListener('click', uploadResizeValueDec);
     uploadResizeIncElement.addEventListener('click', uploadResizeValueInc);
 
-    uploadEffectElement.addEventListener('click', onUploadEffectClick);
+    window.effects.setupEffects();
 
     uploadDescriptionElement.addEventListener('input', validateUploadDescription);
     uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
@@ -162,7 +153,7 @@
     uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
     uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
 
-    uploadEffectElement.removeEventListener('click', onUploadEffectClick);
+    window.effects.resetEffects();
 
     uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
     uploadHashtagsElement.removeEventListener('input', validateUploadHashtags);
