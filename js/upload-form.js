@@ -7,14 +7,15 @@
   var TAG_MAX_LENGTH = 20;
   var TAGS_MAX_NUMBER = 5;
 
-  var uploadFileElement = document.querySelector('.upload-input');
   var uploadFormElement = document.querySelector('.upload-form');
-  var uploadOverlayElement = document.querySelector('.upload-overlay');
-  var uploadResizeElement = document.querySelector('.upload-resize-controls');
-  var uploadEffectPreviewElement = document.querySelector('.effect-image-preview');
-  var uploadDescriptionElement = document.querySelector('.upload-form-description');
-  var uploadHashtagsElement = document.querySelector('.upload-form-hashtags');
-  var uploadCancelElement = document.querySelector('.upload-form-cancel');
+  var uploadFileElement = uploadFormElement.querySelector('.upload-input');
+  var uploadOverlayElement = uploadFormElement.querySelector('.upload-overlay');
+  var uploadResizeElement = uploadOverlayElement.querySelector('.upload-resize-controls');
+  var uploadEffectElement = uploadOverlayElement.querySelector('.upload-effect-controls');
+  var uploadEffectPreviewElement = uploadOverlayElement.querySelector('.effect-image-preview');
+  var uploadDescriptionElement = uploadOverlayElement.querySelector('.upload-form-description');
+  var uploadHashtagsElement = uploadOverlayElement.querySelector('.upload-form-hashtags');
+  var uploadCancelElement = uploadOverlayElement.querySelector('.upload-form-cancel');
 
   // Close upload dialog if Esc key pressed.
   var onUploadOverlayEscPress = function (evt) {
@@ -102,7 +103,7 @@
     uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
 
     window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
-    window.effects.setupEffects();
+    window.filters.initializeFilters(uploadEffectElement, uploadEffectPreviewElement);
 
     uploadDescriptionElement.addEventListener('input', validateUploadDescription);
     uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
@@ -121,8 +122,8 @@
 
     uploadDescriptionElement.removeEventListener('keydown', onUploadDescriptionEscPress);
 
-    window.scale.resetScale();
-    window.effects.resetEffects();
+    window.scale.finalizeScale();
+    window.filters.finalizeFilters();
 
     uploadDescriptionElement.removeEventListener('input', validateUploadDescription);
     uploadHashtagsElement.removeEventListener('input', validateUploadHashtags);

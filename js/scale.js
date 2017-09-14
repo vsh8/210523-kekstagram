@@ -47,7 +47,7 @@ window.scale = (function () {
       uploadResizeIncElement.addEventListener('click', uploadResizeValueInc);
     },
 
-    resetScale: function () {
+    finalizeScale: function () {
       uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
       uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
     }
