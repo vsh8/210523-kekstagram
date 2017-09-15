@@ -18,12 +18,8 @@ window.effectLevelSlider = (function () {
 
       var shiftX = mouseStartX - moveEvt.clientX;
       var effectLevelPinXNew = effectLevelPinX - shiftX;
-      if (effectLevelPinXNew < 0) {
-        effectLevelPinXNew = 0;
-      }
-      if (effectLevelPinXNew > EFFECT_LEVEL_PIN_MAX_X) {
-        effectLevelPinXNew = EFFECT_LEVEL_PIN_MAX_X;
-      }
+      effectLevelPinXNew = Math.max(0, effectLevelPinXNew);
+      effectLevelPinXNew = Math.min(EFFECT_LEVEL_PIN_MAX_X, effectLevelPinXNew);
 
       effectLevelValueChangedCallback(effectLevelPinXNew / EFFECT_LEVEL_PIN_MAX_X);
 
