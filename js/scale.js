@@ -48,15 +48,15 @@ window.scale = (function () {
     },
 
     finalizeScale: function () {
+      uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
+      uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
+
       scaleElement = null;
       adjustScaleCallback = null;
 
       uploadResizeDecElement = null;
       uploadResizeIncElement = null;
       uploadResizeValueElement = null;
-
-      uploadResizeDecElement.removeEventListener('click', uploadResizeValueDec);
-      uploadResizeIncElement.removeEventListener('click', uploadResizeValueInc);
     }
   };
 

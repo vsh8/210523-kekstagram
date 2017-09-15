@@ -59,13 +59,13 @@ window.slider = (function () {
     },
 
     finalizeSlider: function () {
+      sliderPinElement.removeEventListener('mousedown', onSliderPinMouseUp);
+
       sliderValueChangedCallback = null;
 
       sliderElement = null;
       sliderPinElement = null;
       sliderValElement = null;
-
-      sliderPinElement.removeEventListener('mousedown', onSliderPinMouseUp);
     }
   };
 })();
