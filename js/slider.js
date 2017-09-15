@@ -4,7 +4,6 @@ window.slider = (function () {
   var SLIDER_PIN_MAX_X = 455;
 
   var sliderElement = null;
-
   var sliderPinElement = null;
   var sliderValElement = null;
 
@@ -46,7 +45,6 @@ window.slider = (function () {
       sliderValueChangedCallback = onSliderChangedCallback;
 
       sliderElement = sliderElm;
-
       sliderPinElement = sliderElement.querySelector('.upload-effect-level-pin');
       sliderValElement = sliderElement.querySelector('.upload-effect-level-val');
 
@@ -61,6 +59,12 @@ window.slider = (function () {
     },
 
     finalizeSlider: function () {
+      sliderValueChangedCallback = null;
+
+      sliderElement = null;
+      sliderPinElement = null;
+      sliderValElement = null;
+
       sliderPinElement.removeEventListener('mousedown', onSliderPinMouseUp);
     }
   };

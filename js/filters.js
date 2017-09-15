@@ -91,6 +91,10 @@ window.filters = (function () {
     },
 
     finalizeFilters: function () {
+      filtersElement = null;
+      filtersPreviewElement = null;
+      filtersLevelElement = null;
+
       window.slider.finalizeSlider();
       filtersElement.removeEventListener('click', onFilterChosen);
     }
