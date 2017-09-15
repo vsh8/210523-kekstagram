@@ -3,7 +3,6 @@
 (function () {
   var picturesBlock = document.querySelector('.pictures');
   var photoFilters = document.querySelector('.filters');
-  var photoFiltersRadios = photoFilters.querySelectorAll('.filters-radio');
   var photos = null;
 
 
@@ -42,8 +41,8 @@
   };
 
 
-  for (var i = 0; i < photoFiltersRadios.length; i++) {
-    photoFiltersRadios[i].addEventListener('click', function (evt) {
+  photoFilters.addEventListener('click', function (evt) {
+    if (evt.target.tagName.toLowerCase() === 'input' && evt.target.type === 'radio') {
       window.util.debounce(function () {
         var photos2 = null;
         if (evt.target.value === 'recommend') {
@@ -61,9 +60,8 @@
 
         renderPhotos(picturesBlock, photos2);
       });
-    });
-  }
-
+    }
+  });
 
   // Get photos from the server and render them.
   window.backend.load(
