@@ -150,7 +150,15 @@
 
   // Reset upload form on submit.
   var onUploadFormSubmit = function (evt) {
-    // evt.target.reset();
+    window.backend.save(
+        new FormData(uploadFormElement),
+        function (response) {
+          evt.target.reset();
+          closeUploadOverlay(true);
+        },
+        window.error.displayError);
+
+    evt.preventDefault();
   };
 
   // Open upload image dialog.
@@ -174,7 +182,7 @@
   };
 
   // Close upload image dialog.
-  var closeUploadOverlay = function () {
+  var closeUploadOverlay = function (dontReopen) {
     uploadOverlayElement.classList.add('hidden');
 
     document.removeEventListener('keydown', onUploadOverlayEscPress);
@@ -192,7 +200,9 @@
     uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
     uploadFormElement.removeEventListener('input', updateInputValidationStatus);
 
-    uploadFileElement.click();
+    if (!dontReopen) {
+      uploadFileElement.click();
+    }
   };
 
   var uploadFileInputElement = document.querySelector('#upload-file');

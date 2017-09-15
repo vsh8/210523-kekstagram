@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-  // Generate 25 photos.
-  var photosData = window.data.generatePhotos();
-
   // Function for adding the given photos to the specified block.
   var renderPhotos = function (containerBlock, photos) {
     var fragment = document.createDocumentFragment();
@@ -13,7 +10,12 @@
     containerBlock.appendChild(fragment);
   };
 
-  // Draw the photos.
-  var picturesBlock = document.querySelector('.pictures');
-  renderPhotos(picturesBlock, photosData);
+  // Get photos from the server and render them.
+  window.backend.load(
+      function (photos) {
+        // Draw the obtained from the server photos.
+        var picturesBlock = document.querySelector('.pictures');
+        renderPhotos(picturesBlock, photos);
+      },
+      window.error.displayError);
 })();
