@@ -1,6 +1,46 @@
 'use strict';
 
 (function () {
+  var FILTERS_DESC = {
+    'effect-none': {
+      sliderEnabled: false
+    },
+    'effect-chrome': {
+      sliderEnabled: true,
+      filterName: 'grayscale',
+      maxValue: 1,
+      floorValue: false,
+      valueSuffix: ''
+    },
+    'effect-sepia': {
+      sliderEnabled: true,
+      filterName: 'sepia',
+      maxValue: 1,
+      floorValue: false,
+      valueSuffix: ''
+    },
+    'effect-marvin': {
+      sliderEnabled: true,
+      filterName: 'invert',
+      maxValue: 100,
+      floorValue: true,
+      valueSuffix: '%'
+    },
+    'effect-phobos': {
+      sliderEnabled: true,
+      filterName: 'blur',
+      maxValue: 3,
+      floorValue: true,
+      valueSuffix: 'px'
+    },
+    'effect-heat': {
+      sliderEnabled: true,
+      filterName: 'brightness',
+      maxValue: 3,
+      floorValue: false,
+      valueSuffix: ''
+    }
+  };
 
   var DESCRIPTION_MAX_LENGTH = 140;
 
@@ -12,10 +52,31 @@
   var uploadOverlayElement = uploadFormElement.querySelector('.upload-overlay');
   var uploadResizeElement = uploadOverlayElement.querySelector('.upload-resize-controls');
   var uploadEffectElement = uploadOverlayElement.querySelector('.upload-effect-controls');
+  var uploadEffectLevelElement = uploadEffectElement.querySelector('.upload-effect-level');
   var uploadEffectPreviewElement = uploadOverlayElement.querySelector('.effect-image-preview');
   var uploadDescriptionElement = uploadOverlayElement.querySelector('.upload-form-description');
   var uploadHashtagsElement = uploadOverlayElement.querySelector('.upload-form-hashtags');
   var uploadCancelElement = uploadOverlayElement.querySelector('.upload-form-cancel');
+
+  var onFilterChanged = function (filter, filterLevelValue) {
+    var curFilterDesc = FILTERS_DESC[filter];
+    if (curFilterDesc.sliderEnabled) {
+      uploadEffectLevelElement.style.visibility = 'visible';
+
+      var effectValue = filterLevelValue * curFilterDesc.maxValue;
+      if (curFilterDesc.floorValue) {
+        effectValue = Math.floor(effectValue);
+      }
+      uploadEffectPreviewElement.style.filter =
+        curFilterDesc.filterName + '(' + effectValue + curFilterDesc.valueSuffix + ')';
+
+    } else {
+      uploadEffectLevelElement.style.visibility = 'hidden';
+
+      uploadEffectPreviewElement.style.filter = 'none';
+    }
+
+  };
 
   // Close upload dialog if Esc key pressed.
   var onUploadOverlayEscPress = function (evt) {
@@ -103,7 +164,7 @@
     uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
 
     window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
-    window.filters.initializeFilters(uploadEffectElement, uploadEffectPreviewElement);
+    window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
 
     uploadDescriptionElement.addEventListener('input', validateUploadDescription);
     uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
