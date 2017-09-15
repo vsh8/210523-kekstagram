@@ -862,3 +862,43 @@ input[type=radio]:checked + .upload-effect-label .upload-effect-preview {
 .footer-social-item-vk {
   background-position: -84px 0;
 }
+
+
+.error-alert {
+  position: absolute;
+  left: 50%;
+  top: 100px;
+
+  visibility: hidden;
+}
+
+.error-alert-box {
+  position: relative;
+
+  width: 500px;
+  margin-left: -250px;
+
+  z-index: 3;
+
+  background: #000000;
+  border: 1px solid red;
+}
+
+.error-alert-msg {
+  padding: 15px 10px 10px;
+
+  color: red;
+  font-size: 20px;
+}
+
+.error-alert-close-btn {
+  position: absolute;
+  right: 5px;
+
+  padding: 0;
+  border: 0;
+
+  font-size: 20px;
+  color: inherit;
+  background: #000000;
+}
