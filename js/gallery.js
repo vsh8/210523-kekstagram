@@ -8,14 +8,14 @@
 
 
   // Add the given photos to the specified block.
-  var renderPhotos = function (containerBlock, photos) {
+  var renderPhotos = function (containerBlock, phs) {
     while (containerBlock.firstChild) {
       containerBlock.removeChild(containerBlock.firstChild);
     }
 
     var fragment = document.createDocumentFragment();
-    for (var j = 0; j < photos.length; j++) {
-      fragment.appendChild(window.picture.renderPhoto(photos[j]));
+    for (var j = 0; j < phs.length; j++) {
+      fragment.appendChild(window.picture.renderPhoto(phs[j]));
     }
 
     containerBlock.appendChild(fragment);
@@ -44,21 +44,23 @@
 
   for (var i = 0; i < photoFiltersRadios.length; i++) {
     photoFiltersRadios[i].addEventListener('click', function (evt) {
-      var photos2 = null;
-      if (evt.target.value == 'recommend') {
-        photos2 = photos;
-      } else {
-        photos2 = photos.slice();
-        if (evt.target.value == 'popular') {
-          sortPhotosByLikesNumber(photos2);
-        } else if (evt.target.value == 'discussed') {
-          sortPhotosByCommentsNumber(photos2);
+      window.util.debounce(function () {
+        var photos2 = null;
+        if (evt.target.value === 'recommend') {
+          photos2 = photos;
         } else {
-          randomizePhotosOrdering(photos2);
+          photos2 = photos.slice();
+          if (evt.target.value === 'popular') {
+            sortPhotosByLikesNumber(photos2);
+          } else if (evt.target.value === 'discussed') {
+            sortPhotosByCommentsNumber(photos2);
+          } else {
+            randomizePhotosOrdering(photos2);
+          }
         }
-      }
 
-      renderPhotos(picturesBlock, photos2);
+        renderPhotos(picturesBlock, photos2);
+      });
     });
   }
 
