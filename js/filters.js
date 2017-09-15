@@ -26,12 +26,13 @@ window.filters = (function () {
       filtersElement = filtersElm;
       filterChangedCallback = onFilterChangedCallback;
 
-      currentFilter = 'effect-none';
-
       var scaleElement = document.querySelector('.upload-effect-level');
 
       window.slider.initializeSlider(scaleElement, onFilterLevelChanged);
       filtersElement.addEventListener('click', onFilterChosen);
+
+      currentFilter = 'effect-none';
+      window.slider.resetSlider();
     },
 
     finalizeFilters: function () {
