@@ -20,12 +20,8 @@ window.slider = (function () {
 
       var shiftX = mouseStartX - moveEvt.clientX;
       var sliderPinXNew = sliderPinX - shiftX;
-      if (sliderPinXNew < 0) {
-        sliderPinXNew = 0;
-      }
-      if (sliderPinXNew > SLIDER_PIN_MAX_X) {
-        sliderPinXNew = SLIDER_PIN_MAX_X;
-      }
+      sliderPinXNew = Math.max(0, sliderPinXNew);
+      sliderPinXNew = Math.min(SLIDER_PIN_MAX_X, sliderPinXNew);
 
       sliderValueChangedCallback(sliderPinXNew / SLIDER_PIN_MAX_X);
 
