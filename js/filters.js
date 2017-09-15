@@ -36,11 +36,11 @@ window.filters = (function () {
     },
 
     finalizeFilters: function () {
-      filtersElement = null;
-      filterChangedCallback = null;
-
       window.slider.finalizeSlider();
       filtersElement.removeEventListener('click', onFilterChosen);
+
+      filtersElement = null;
+      filterChangedCallback = null;
     }
   };
 })();
