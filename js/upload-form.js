@@ -47,6 +47,7 @@
   var TAG_MAX_LENGTH = 20;
   var TAGS_MAX_NUMBER = 5;
 
+  var uploadFileInputElement = document.querySelector('#upload-file');
   var uploadFormElement = document.querySelector('.upload-form');
   var uploadFileElement = uploadFormElement.querySelector('.upload-input');
   var uploadOverlayElement = uploadFormElement.querySelector('.upload-overlay');
@@ -54,6 +55,7 @@
   var uploadEffectElement = uploadOverlayElement.querySelector('.upload-effect-controls');
   var uploadEffectLevelElement = uploadEffectElement.querySelector('.upload-effect-level');
   var uploadEffectPreviewElement = uploadOverlayElement.querySelector('.effect-image-preview');
+  var uploadEffectPreviewControlElements = uploadOverlayElement.querySelectorAll('.upload-effect-preview');
   var uploadDescriptionElement = uploadOverlayElement.querySelector('.upload-form-description');
   var uploadHashtagsElement = uploadOverlayElement.querySelector('.upload-form-hashtags');
   var uploadCancelElement = uploadOverlayElement.querySelector('.upload-form-cancel');
@@ -153,8 +155,7 @@
     window.backend.save(
         new FormData(uploadFormElement),
         function (response) {
-          evt.target.reset();
-          closeUploadOverlay(true);
+          closeUploadOverlay(null, true);
         },
         window.error.displayError);
 
@@ -163,26 +164,41 @@
 
   // Open upload image dialog.
   var openUploadOverlay = function () {
-    uploadOverlayElement.classList.remove('hidden');
+    if (uploadFileInputElement.files && uploadFileInputElement.files[0]) {
+      var file = uploadFileInputElement.files[0];
+      var reader = new FileReader();
 
-    document.addEventListener('keydown', onUploadOverlayEscPress);
+      reader.addEventListener('load', function (evt) {
 
-    uploadCancelElement.addEventListener('click', closeUploadOverlay);
+        uploadEffectPreviewElement.setAttribute('src', evt.target.result);
+        for (var i = 0; i < uploadEffectPreviewControlElements.length; i++) {
+          var previewControl = uploadEffectPreviewControlElements[i];
+          previewControl.style.backgroundImage = 'url("' + evt.target.result + '")';
+        }
 
-    uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
+        uploadOverlayElement.classList.remove('hidden');
 
-    window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
-    window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
+        document.addEventListener('keydown', onUploadOverlayEscPress);
 
-    uploadDescriptionElement.addEventListener('input', validateUploadDescription);
-    uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+        uploadCancelElement.addEventListener('click', closeUploadOverlay);
 
-    uploadFormElement.addEventListener('submit', onUploadFormSubmit);
-    uploadFormElement.addEventListener('input', updateInputValidationStatus);
+        uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
+
+        window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
+        window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
+
+        uploadDescriptionElement.addEventListener('input', validateUploadDescription);
+        uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+
+        uploadFormElement.addEventListener('submit', onUploadFormSubmit);
+        uploadFormElement.addEventListener('input', updateInputValidationStatus);
+      });
+      reader.readAsDataURL(file);
+    }
   };
 
   // Close upload image dialog.
-  var closeUploadOverlay = function (dontReopen) {
+  var closeUploadOverlay = function (evt, dontReopen) {
     uploadOverlayElement.classList.add('hidden');
 
     document.removeEventListener('keydown', onUploadOverlayEscPress);
@@ -200,11 +216,12 @@
     uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
     uploadFormElement.removeEventListener('input', updateInputValidationStatus);
 
+    uploadFormElement.reset();
+
     if (!dontReopen) {
       uploadFileElement.click();
     }
   };
 
-  var uploadFileInputElement = document.querySelector('#upload-file');
   uploadFileInputElement.addEventListener('change', openUploadOverlay);
 })();
