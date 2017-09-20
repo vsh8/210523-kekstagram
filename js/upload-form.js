@@ -88,7 +88,9 @@
 
   // Prevent upload dialog closing on pressing Esc key in description input.
   var onUploadDescriptionEscPress = function (evt) {
-    window.util.isEscEvent(evt, function () { evt.stopPropagation(); });
+    window.util.isEscEvent(evt, function () {
+      evt.stopPropagation();
+    });
   };
 
   var adjustPreviewImageScale = function (scale) {
