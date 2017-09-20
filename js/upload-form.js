@@ -47,7 +47,8 @@
   var TAG_MAX_LENGTH = 20;
   var TAGS_MAX_NUMBER = 5;
 
-  var uploadFileInputElement = document.querySelector('#upload-file');
+  var uploadFileInputElement = document.querySelector('.upload-input');
+  var uploadFileControlElement = document.querySelector('.upload-control');
   var uploadFormElement = document.querySelector('.upload-form');
   var uploadFileElement = uploadFormElement.querySelector('.upload-input');
   var uploadOverlayElement = uploadFormElement.querySelector('.upload-overlay');
@@ -163,38 +164,35 @@
   };
 
   // Open upload image dialog.
-  var openUploadOverlay = function () {
-    if (uploadFileInputElement.files && uploadFileInputElement.files[0]) {
-      var file = uploadFileInputElement.files[0];
-      var reader = new FileReader();
+  var openUploadOverlay = function (file) {
+    var reader = new FileReader();
 
-      reader.addEventListener('load', function (evt) {
+    reader.addEventListener('load', function (evt) {
 
-        uploadEffectPreviewElement.setAttribute('src', evt.target.result);
-        for (var i = 0; i < uploadEffectPreviewControlElements.length; i++) {
-          var previewControl = uploadEffectPreviewControlElements[i];
-          previewControl.style.backgroundImage = 'url("' + evt.target.result + '")';
-        }
+      uploadEffectPreviewElement.setAttribute('src', evt.target.result);
+      for (var i = 0; i < uploadEffectPreviewControlElements.length; i++) {
+        var previewControl = uploadEffectPreviewControlElements[i];
+        previewControl.style.backgroundImage = 'url("' + evt.target.result + '")';
+      }
 
-        uploadOverlayElement.classList.remove('hidden');
+      uploadOverlayElement.classList.remove('hidden');
 
-        document.addEventListener('keydown', onUploadOverlayEscPress);
+      document.addEventListener('keydown', onUploadOverlayEscPress);
 
-        uploadCancelElement.addEventListener('click', closeUploadOverlay);
+      uploadCancelElement.addEventListener('click', closeUploadOverlay);
 
-        uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
+      uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
 
-        window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
-        window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
+      window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
+      window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
 
-        uploadDescriptionElement.addEventListener('input', validateUploadDescription);
-        uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+      uploadDescriptionElement.addEventListener('input', validateUploadDescription);
+      uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
 
-        uploadFormElement.addEventListener('submit', onUploadFormSubmit);
-        uploadFormElement.addEventListener('input', updateInputValidationStatus);
-      });
-      reader.readAsDataURL(file);
-    }
+      uploadFormElement.addEventListener('submit', onUploadFormSubmit);
+      uploadFormElement.addEventListener('input', updateInputValidationStatus);
+    });
+    reader.readAsDataURL(file);
   };
 
   // Close upload image dialog.
@@ -223,5 +221,41 @@
     }
   };
 
-  uploadFileInputElement.addEventListener('change', openUploadOverlay);
+  var onUploadFileInputElementChange = function (evt) {
+    if (evt.target.files[0]) {
+      var file = evt.target.files[0];
+      openUploadOverlay(file);
+    }
+  };
+
+  uploadFileInputElement.addEventListener('change', onUploadFileInputElementChange);
+
+
+  var onUploadFileControlElementDragDrop = function (evt) {
+    evt.preventDefault();
+    evt.target.style.border = '';
+    openUploadOverlay(evt.dataTransfer.files[0]);
+  };
+
+  var onUploadFileControlElementDragEnd = function (evt) {
+    evt.dataTransfer.clearData();
+  };
+
+  var onUploadFileControlElementDragEnter = function (evt) {
+    evt.target.style.border = '1px dashed red';
+  };
+
+  var onUploadFileControlElementDragLeave = function (evt) {
+    evt.target.style.border = '';
+  };
+
+  var onUploadFileControlElementDragOver = function (evt) {
+    evt.preventDefault();
+  };
+
+  uploadFileControlElement.addEventListener('drop', onUploadFileControlElementDragDrop);
+  uploadFileControlElement.addEventListener('dragend', onUploadFileControlElementDragEnd);
+  uploadFileControlElement.addEventListener('dragenter', onUploadFileControlElementDragEnter);
+  uploadFileControlElement.addEventListener('dragleave', onUploadFileControlElementDragLeave);
+  uploadFileControlElement.addEventListener('dragover', onUploadFileControlElementDragOver);
 })();
