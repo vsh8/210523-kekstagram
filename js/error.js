@@ -6,7 +6,7 @@ window.error = (function () {
   var errorAlertCloseButton = errorAlertElement.querySelector('.error-alert-close-btn');
 
   var showErrorAlert = function (errMsg) {
-    errorAlertMessageElement.innerHTML = errMsg;
+    errorAlertMessageElement.textContent = errMsg;
     errorAlertElement.style.visibility = 'visible';
 
     errorAlertCloseButton.addEventListener('click', closeErrorAlert);

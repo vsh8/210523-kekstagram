@@ -45,6 +45,8 @@ window.scale = (function () {
 
       uploadResizeDecElement.addEventListener('click', uploadResizeValueDec);
       uploadResizeIncElement.addEventListener('click', uploadResizeValueInc);
+
+      adjustScaleCallback(100);
     },
 
     finalizeScale: function () {

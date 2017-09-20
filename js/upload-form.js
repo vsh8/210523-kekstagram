@@ -47,6 +47,8 @@
   var TAG_MAX_LENGTH = 20;
   var TAGS_MAX_NUMBER = 5;
 
+  var uploadFileInputElement = document.querySelector('.upload-input');
+  var uploadFileControlElement = document.querySelector('.upload-control');
   var uploadFormElement = document.querySelector('.upload-form');
   var uploadFileElement = uploadFormElement.querySelector('.upload-input');
   var uploadOverlayElement = uploadFormElement.querySelector('.upload-overlay');
@@ -54,6 +56,7 @@
   var uploadEffectElement = uploadOverlayElement.querySelector('.upload-effect-controls');
   var uploadEffectLevelElement = uploadEffectElement.querySelector('.upload-effect-level');
   var uploadEffectPreviewElement = uploadOverlayElement.querySelector('.effect-image-preview');
+  var uploadEffectPreviewControlElements = uploadOverlayElement.querySelectorAll('.upload-effect-preview');
   var uploadDescriptionElement = uploadOverlayElement.querySelector('.upload-form-description');
   var uploadHashtagsElement = uploadOverlayElement.querySelector('.upload-form-hashtags');
   var uploadCancelElement = uploadOverlayElement.querySelector('.upload-form-cancel');
@@ -85,7 +88,9 @@
 
   // Prevent upload dialog closing on pressing Esc key in description input.
   var onUploadDescriptionEscPress = function (evt) {
-    window.util.isEscEvent(evt, evt.stopPropagation);
+    window.util.isEscEvent(evt, function () {
+      evt.stopPropagation();
+    });
   };
 
   var adjustPreviewImageScale = function (scale) {
@@ -150,39 +155,49 @@
 
   // Reset upload form on submit.
   var onUploadFormSubmit = function (evt) {
+    evt.preventDefault();
+
     window.backend.save(
         new FormData(uploadFormElement),
         function (response) {
-          evt.target.reset();
-          closeUploadOverlay(true);
+          closeUploadOverlay(null, true);
         },
         window.error.displayError);
-
-    evt.preventDefault();
   };
 
+
   // Open upload image dialog.
-  var openUploadOverlay = function () {
-    uploadOverlayElement.classList.remove('hidden');
+  var openUploadOverlay = function (file) {
+    var reader = new FileReader();
+    reader.addEventListener('load', function (evt) {
+      uploadEffectPreviewElement.setAttribute('src', evt.target.result);
+      for (var i = 0; i < uploadEffectPreviewControlElements.length; i++) {
+        var previewControl = uploadEffectPreviewControlElements[i];
+        previewControl.style.backgroundImage = 'url("' + evt.target.result + '")';
+      }
 
-    document.addEventListener('keydown', onUploadOverlayEscPress);
+      uploadOverlayElement.classList.remove('hidden');
 
-    uploadCancelElement.addEventListener('click', closeUploadOverlay);
+      document.addEventListener('keydown', onUploadOverlayEscPress);
 
-    uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
+      uploadCancelElement.addEventListener('click', closeUploadOverlay);
 
-    window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
-    window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
+      uploadDescriptionElement.addEventListener('keydown', onUploadDescriptionEscPress);
 
-    uploadDescriptionElement.addEventListener('input', validateUploadDescription);
-    uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+      window.scale.initializeScale(uploadResizeElement, adjustPreviewImageScale);
+      window.filters.initializeFilters(uploadEffectElement, onFilterChanged);
 
-    uploadFormElement.addEventListener('submit', onUploadFormSubmit);
-    uploadFormElement.addEventListener('input', updateInputValidationStatus);
+      uploadDescriptionElement.addEventListener('input', validateUploadDescription);
+      uploadHashtagsElement.addEventListener('input', validateUploadHashtags);
+
+      uploadFormElement.addEventListener('submit', onUploadFormSubmit);
+      uploadFormElement.addEventListener('input', updateInputValidationStatus);
+    });
+    reader.readAsDataURL(file);
   };
 
   // Close upload image dialog.
-  var closeUploadOverlay = function (dontReopen) {
+  var closeUploadOverlay = function (evt, dontReopen) {
     uploadOverlayElement.classList.add('hidden');
 
     document.removeEventListener('keydown', onUploadOverlayEscPress);
@@ -200,11 +215,55 @@
     uploadFormElement.removeEventListener('submit', onUploadFormSubmit);
     uploadFormElement.removeEventListener('input', updateInputValidationStatus);
 
+    uploadFormElement.reset();
+
     if (!dontReopen) {
       uploadFileElement.click();
     }
   };
 
-  var uploadFileInputElement = document.querySelector('#upload-file');
-  uploadFileInputElement.addEventListener('change', openUploadOverlay);
+
+  var onUploadFileInputElementChange = function (evt) {
+    if (evt.target.files[0]) {
+      openUploadOverlay(evt.target.files[0]);
+    }
+  };
+
+  uploadFileInputElement.addEventListener('change', onUploadFileInputElementChange);
+
+
+  var onUploadFileControlElementDragDrop = function (evt) {
+    evt.preventDefault();
+    evt.target.style.border = '';
+
+    if (evt.dataTransfer.files[0]) {
+      // Set the upload file input's `files` property in order to send the form
+      // using FormData.
+      uploadFileInputElement.files = evt.dataTransfer.files;
+
+      openUploadOverlay(evt.dataTransfer.files[0]);
+    }
+  };
+
+  var onUploadFileControlElementDragEnd = function (evt) {
+    evt.dataTransfer.clearData();
+  };
+
+  var onUploadFileControlElementDragEnter = function (evt) {
+    evt.target.style.border = '1px dashed red';
+  };
+
+  var onUploadFileControlElementDragLeave = function (evt) {
+    evt.target.style.border = '';
+  };
+
+  var onUploadFileControlElementDragOver = function (evt) {
+    evt.preventDefault();
+  };
+
+  uploadFileControlElement.addEventListener('drop', onUploadFileControlElementDragDrop);
+  uploadFileControlElement.addEventListener('dragend', onUploadFileControlElementDragEnd);
+  uploadFileControlElement.addEventListener('dragenter', onUploadFileControlElementDragEnter);
+  uploadFileControlElement.addEventListener('dragleave', onUploadFileControlElementDragLeave);
+  uploadFileControlElement.addEventListener('dragover', onUploadFileControlElementDragOver);
 })();
