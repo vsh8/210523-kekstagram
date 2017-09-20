@@ -235,6 +235,10 @@
     evt.target.style.border = '';
 
     if (evt.dataTransfer.files[0]) {
+      // Set the upload file input's `files` property in order to send the form
+      // using FormData.
+      uploadFileInputElement.files = evt.dataTransfer.files;
+
       openUploadOverlay(evt.dataTransfer.files[0]);
     }
   };
