@@ -88,7 +88,7 @@
 
   // Prevent upload dialog closing on pressing Esc key in description input.
   var onUploadDescriptionEscPress = function (evt) {
-    window.util.isEscEvent(evt, evt.stopPropagation);
+    window.util.isEscEvent(evt, function () { evt.stopPropagation(); });
   };
 
   var adjustPreviewImageScale = function (scale) {
@@ -153,22 +153,21 @@
 
   // Reset upload form on submit.
   var onUploadFormSubmit = function (evt) {
+    evt.preventDefault();
+
     window.backend.save(
         new FormData(uploadFormElement),
         function (response) {
           closeUploadOverlay(null, true);
         },
         window.error.displayError);
-
-    evt.preventDefault();
   };
+
 
   // Open upload image dialog.
   var openUploadOverlay = function (file) {
     var reader = new FileReader();
-
     reader.addEventListener('load', function (evt) {
-
       uploadEffectPreviewElement.setAttribute('src', evt.target.result);
       for (var i = 0; i < uploadEffectPreviewControlElements.length; i++) {
         var previewControl = uploadEffectPreviewControlElements[i];
@@ -221,10 +220,10 @@
     }
   };
 
+
   var onUploadFileInputElementChange = function (evt) {
     if (evt.target.files[0]) {
-      var file = evt.target.files[0];
-      openUploadOverlay(file);
+      openUploadOverlay(evt.target.files[0]);
     }
   };
 
@@ -234,7 +233,10 @@
   var onUploadFileControlElementDragDrop = function (evt) {
     evt.preventDefault();
     evt.target.style.border = '';
-    openUploadOverlay(evt.dataTransfer.files[0]);
+
+    if (evt.dataTransfer.files[0]) {
+      openUploadOverlay(evt.dataTransfer.files[0]);
+    }
   };
 
   var onUploadFileControlElementDragEnd = function (evt) {
